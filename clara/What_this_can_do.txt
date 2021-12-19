@@ -1,0 +1,14 @@
+Here I will write what my voice assistant is capable of to keep track of it -
+
+1.Tell good morning with weather forecast using 'Openweather Api' with the song 'Back in Black - AC/DC'.
+2.Open Email(Gmail)
+3.Open Facebook
+4.open web whatsapp
+5.Can open any windows appplication
+6.Ai added to the assistant(currently the database is so small that it may cause some error in prediction
+over fitting may happen)
+7.The output and commands are if/else controlled never found a way to apply AI for commands
+8.Can be used with arduino giving correct serial output
+9.speech recognition with the app 
+
+
