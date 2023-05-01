@@ -1,5 +1,4 @@
 import speech_recognition as sr 
-import winsound
 import pygame
 # import pyttsx3  
 from playsound import playsound
@@ -16,6 +15,11 @@ import serial
 import time
 import random
 from datetime import date
+
+
+# Local Module Import 
+from modules.getWeatherDetails import getWeatherData
+
 
 # import pickle
 stemmer = LancasterStemmer()
@@ -157,48 +161,7 @@ def call_ai(text):
     commands(labels[predict] , text)
 
 
-with open("links/others.json" , "r") as file3 :
-    other_data = json.load(file3)
-    file3.close()
-
-if other_data["weather_date"] == str(date.today()):
-    weather_forecast = other_data["weather_value"]
-else :
-    api_key = #this api key should be made from the website 
-    base_url = "http://api.openweathermap.org/data/2.5/weather?"
-    city_name = 'Agarpāra, IN'
-    complete_url = base_url + "appid=" + api_key + "&q=" + city_name 
-    response = requests.get(complete_url) 
-    x = response.json() 
-    y = x["main"] 
-    current_temperature = y["temp"] 
-    current_pressure = y["pressure"] 
-    current_humidiy = y["humidity"] 
-
-    z = x["weather"] 
-
-    weather_description = z[0]["description"] 
-    
-    weather_forecast = ((" Temperature is") +
-                str(format((float(current_temperature)-273.15) , ".2f"))+'degree celsius' + 
-        "\n atmospheric pressure is " +
-                str(current_pressure)+'hPa' +
-        "\n humidity is " +
-                str(current_humidiy))
-    data = {
-        "weather_date" : str(date.today) ,
-        "weather_value" : weather_forecast
-    }
-
-
-    with open("links/others.json" , "w") as file4:
-        json.dump(data ,  file4)
-
-
-
-
-weather_forecast = 'now we are testing . weather api is used for final purpose'
-
+weather_forecast = getWeatherData()
 
 
 r = sr.Recognizer()  
