@@ -2,6 +2,6 @@ from modules import mlModel
 
 mlModel.createModel()
 
-result = mlModel.askAi("Hi Clara")
+result = mlModel.askAi("message sohini in whatsapp")
 
 print(result)

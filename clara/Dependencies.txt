@@ -6,3 +6,6 @@ numpy
 tflearn
 serial
 tensorflow
+sklearn
+pickle
+pandas
