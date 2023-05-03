@@ -7,51 +7,64 @@ from sklearn.svm import SVC
 import pickle , os
 from sklearn.model_selection import GridSearchCV
 
-def createModel() :
-    sno = nltk.stem.SnowballStemmer('english')
-    df = pd.DataFrame()
+class predictionModel :
+    def __init__(self) -> None:
+        self.clf = None 
+        self.le = None
+        self.transformer = None
 
-    with open("clara/training_data/training.json") as file:
-        data = json.load(file)
+    # create the model (private Method)
+    def __createModel() :
+        sno = nltk.stem.SnowballStemmer('english')
+        df = pd.DataFrame()
 
-    data = data["intents"]
-    sentence_arr = []
-    labels = []
+        with open("clara/training_data/training.json") as file:
+            data = json.load(file)
 
-    for intent in data:
-        for sentence in intent["patterns"]:
-            labels.append(intent["tag"])
-            sentence_arr.append((" ".join([sno.stem(x.lower()) for x in sentence.split(" ")])))
+        data = data["intents"]
+        sentence_arr = []
+        labels = []
 
-    df = pd.DataFrame({"text":sentence_arr  , "labels" : labels})
-    le = LabelEncoder()
-    transformer = TfidfVectorizer()
-    Y = le.fit_transform(labels)
-    X_train = transformer.fit_transform(df["text"])
+        for intent in data:
+            for sentence in intent["patterns"]:
+                labels.append(intent["tag"])
+                sentence_arr.append((" ".join([sno.stem(x.lower()) for x in sentence.split(" ")])))
 
-    if not os.path.isfile("data/bestParam.pkl") :
-        param_grid = {'C': [0.01, 0.1, 1, 10, 100],
-                    'kernel': ['linear', 'poly', 'rbf', 'sigmoid']}
+        df = pd.DataFrame({"text":sentence_arr  , "labels" : labels})
+        le = LabelEncoder()
+        transformer = TfidfVectorizer()
+        Y = le.fit_transform(labels)
+        X_train = transformer.fit_transform(df["text"])
 
-        grid = GridSearchCV(SVC(), param_grid, cv=5)
-        grid.fit(X_train, Y)
+        if not os.path.isfile("data/bestParam.pkl") :
+            param_grid = {'C': [0.01, 0.1, 1, 10, 100],
+                        'kernel': ['linear', 'poly', 'rbf', 'sigmoid']}
 
-        print("Best hyperparameters: ", grid.best_params_)
-        pickle.dump(grid.best_params_ , open("data/bestParam.pkl" , "wb"))
-        grid = grid.best_params_
+            grid = GridSearchCV(SVC(), param_grid, cv=5)
+            grid.fit(X_train, Y)
 
-    else : 
-        grid = pickle.load(open("data/bestParam.pkl" , "rb"))
+            print("Best hyperparameters: ", grid.best_params_)
+            pickle.dump(grid.best_params_ , open("data/bestParam.pkl" , "wb"))
+            grid = grid.best_params_
 
-    print(grid)
+        else : 
+            grid = pickle.load(open("data/bestParam.pkl" , "rb"))
 
-    clf = SVC(C = grid["C"] , kernel=grid["kernel"])  
-    clf.fit(X_train , Y)
-    pickle.dump((clf , le , transformer) , open("data/svc.pkl" , "wb"))
+        clf = SVC(C = grid["C"] , kernel=grid["kernel"])  
+        clf.fit(X_train , Y)
+        pickle.dump((clf , le , transformer) , open("data/svc.pkl" , "wb"))
 
+    # initiate the model
+    def openModel(self) -> None:
+        if not os.path.isfile("data/svc.pkl") : 
+            self.__createModel()() 
+        self.clf , self.le , self.transformer= pickle.load(open("data/svc.pkl" , "rb"))
+        
+    # use the model for prediction
+    def askAi(self , sentence : str) -> str:
+        if self.clf == None or self.transformer == None or self.le == None:
+            print("Model is not Loaded")
+            self.openModel()
 
-def askAi(sentence):
-    clf , le , transformer= pickle.load(open("data/svc.pkl" , "rb"))
-
-    result = clf.predict(transformer.transform([sentence]))
-    return le.inverse_transform(result)
+        result = self.clf.predict(self.transformer.transform([sentence]))
+        return self.le.inverse_transform(result)[0]

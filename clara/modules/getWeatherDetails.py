@@ -1,8 +1,11 @@
 import requests , json
 from datetime import date
+import config
+import time 
 
 def getWeatherData(debug=False) :
-    if debug:
+    if config.debug:
+        time.sleep(2)
         return "Testing"
     
     with open("links/others.json" , "r") as file3 :
@@ -43,4 +46,4 @@ def getWeatherData(debug=False) :
         with open("links/others.json" , "w") as file4:
             json.dump(data ,  file4)
         
-        return weather_forecast
+    return weather_forecast

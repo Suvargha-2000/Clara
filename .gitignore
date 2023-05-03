@@ -1,3 +1,4 @@
 venv
 clara/modules/__pycache__/
 data
+clara/config.py
