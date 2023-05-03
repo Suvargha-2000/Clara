@@ -17,14 +17,15 @@ class mainModel:
             if self.command :
                 t1 = self.predict()
                 self.handleCommand.startProcess(self.result , self.command)
-                t1.join()
+                if not t1:
+                    t1.join()
 
     def predict(self) :
         self.result = self.model.askAi(self.command)
         print(self.result)
-        t1 = threading.Thread(target = self.speak , args=())
-        t1.start()
-        return t1
+        # t1 = threading.Thread(target = self.speak , args=())
+        # t1.start()
+        # return t1
     
     def speak(self , sentence = None) :
         if sentence == None : 
